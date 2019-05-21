@@ -1,0 +1,14 @@
+{
+  "name": "fe-test-tool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "xiaoda",
+  "license": "ISC",
+  "devDependencies": {
+    "yargs": "^13.2.4"
+  }
+}
