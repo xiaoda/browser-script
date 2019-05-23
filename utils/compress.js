@@ -22,8 +22,8 @@ const argv = require('yargs').argv
 function compress (content) {
   return content
     /* Remove white spaces */
-    .replace(/\s+([\n\(\)\{\}\=\:\.\,\'\"])/g, (match, p1) => p1)
-    .replace(/([\n\(\)\{\}\=\:\.\,\'\"])[ \f\r\t\v]+/g, (match, p1) => p1)
+    .replace(/\s+([\n\(\)\{\}\=\>\:\.\,\?\!\'\"])/g, (match, p1) => p1)
+    .replace(/([\n\(\)\{\}\=\>\:\.\,\?\!\'\"])[ \f\r\t\v]+/g, (match, p1) => p1)
     /* Remove annotations */
     .replace(/\/\*[\s\S]+?\*\//, '')
     .replace(/\/\/[\s\S]+?\n/, '\n')
