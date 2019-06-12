@@ -15,7 +15,7 @@ const argv = require('yargs').argv
   fileContent = compress(fileContent)
   fileContent = recoverStr(fileContent, strList)
 
-  const distFilePath = argv.output
+  const distFilePath = process.argv[3]
   fs.writeFileSync(distFilePath, fileContent)
 })()
 
