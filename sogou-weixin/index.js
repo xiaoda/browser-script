@@ -5,14 +5,11 @@
   let searchResultList = []
   let requestCount = 0
 
-  function getSearchResult (url, index) {
-    $.get(url, {
-      page: index + 1
-    }).done((data) => {
-      const $html = $(data)
-      $html.find('.main-left .news-list > li').each(function () {
+  function getSearchResult (url) {
+    function _doneCallback (html) {
+      $(html).find('.main-left .news-list > li').each(function () {
         const $parent = $('<div>')
-        $parent.append($(this))
+        $parent.append($(this).clone())
         const dateSelector = '.txt-box .s-p .s2'
         const date = $parent.find(dateSelector).text().match(/\d+/)[0]
         $parent.find(dateSelector).empty().text(
@@ -23,10 +20,24 @@
           html: $parent.html()
         })
       })
-    }).always(_ => {
+    }
+    function _alwaysCallback () {
       requestCount++
       if (requestCount === OPTIONS.pagesNumber) render()
+    }
+    /*
+    const _window = window.open(url)
+    $(_window.document).ready(_ => {
+      setTimeout(_ => {
+        _doneCallback($(_window.document))
+        setTimeout(_ => {
+          _window.close()
+          _alwaysCallback()
+        }, 100)
+      }, 10)
     })
+    */
+    $.get(url).done(_doneCallback).always(_alwaysCallback)
   }
 
   function render () {
@@ -49,19 +60,21 @@
   }
 
   function showLoading () {
-    $('body').append(`<div id="xiaodaLoading" style="position: fixed; right: 10px; bottom: 10px;">Loading...</div>`)
+    $('body').append(`<div id="xiaodaStatus" style="position: fixed; right: 10px; bottom: 10px;">Loading...</div>`)
   }
 
   function hideLoading () {
-    $('#xiaodaLoading').remove()
+    $('#xiaodaStatus').text('Done.')
+    $('#pagebar_container').remove()
   }
 
   function init () {
     showLoading()
-    const url = window.location.href
+    const baseUrl = window.location.href
     for (let i = 0; i < OPTIONS.pagesNumber; i++) {
+      const url = `${baseUrl.replace(/&page=\d+/, '')}&page=${i+1}`
       setTimeout(_ => {
-        getSearchResult(url, i)
+        getSearchResult(url)
       }, i * 1500 + Math.random() * 500)
     }
   }
