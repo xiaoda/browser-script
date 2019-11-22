@@ -9,36 +9,36 @@ const argv = require('yargs').argv
   let fileContent = fs.readFileSync(srcFilePath, {
     encoding: 'utf8'
   })
+  fileContent = removeAnnotations(fileContent)
   const replaceStrResult = replaceStr(fileContent)
-  const strList = replaceStrResult.strList
-  fileContent = replaceStrResult.content
-  fileContent = compress(fileContent)
-  fileContent = recoverStr(fileContent, strList)
+  fileContent = compress(replaceStrResult.content)
+  fileContent = recoverStr(fileContent, replaceStrResult.strList)
 
-  const distFilePath = process.argv[3]
-  fs.writeFileSync(distFilePath, fileContent)
+  const distFilePath = srcFilePath.replace(/\.js$/, '.min.js')
+  fs.writeFileSync(distFilePath, fileContent, {
+    encoding: 'utf8'
+  })
 })()
+
+function removeAnnotations (content) {
+  return content
+    .replace(/\/\*[^\/\*]*\*\//g, '')
+    .replace(/\/\/[^\n]*\n/g, '')
+}
 
 function compress (content) {
   return content
-    /* Remove white spaces */
-    .replace(/\s+([\n\(\)\{\}\=\>\:\.\,\?\!\'\"])/g, (match, p1) => p1)
-    .replace(/([\n\(\)\{\}\=\>\:\.\,\?\!\'\"])[ \f\r\t\v]+/g, (match, p1) => p1)
-    /* Remove annotations */
-    .replace(/\/\*[\s\S]+?\*\//, '')
-    .replace(/\/\/[\s\S]+?\n/, '\n')
-    /* Remove new lines */
-    .replace(/(.)\n(.)/g, (match, p1, p2) => {
-      const withSeparator = `${p1};${p2}`
-      const withoutSeparator = `${p1}${p2}`
-      if (/[\(\{\=\:\,]/.test(p1)) {
-        return withoutSeparator
-      } else if (/\./.test(p2)) {
-        return withoutSeparator
-      } else {
-        return withSeparator
-      }
-    })
+    /* Remove blank characters */
+    .replace(/\s+([\n\(\)\{\}\[\]\=\>\<\:\;\.\,\?\!\+\-\*\/])/g, (match, p) => p) // From front
+    .replace(/([\n\(\{\[\=\>\<\:\;\.\,\?\!])\s+/g, (match, p) => p) // From behind
+    .replace(/([\)\}\]\+\-\*\/])[ \f\r\t\v]+/g, (match, p) => p) // From behind & needs semicolon
+
+    /* Remove new lines from very beginning & end */
+    .replace(/^\n+/, '')
+    .replace(/\n+$/, '')
+
+    /* Remove new lines & add semicolons */
+    .replace(/\n/g, ';')
 }
 
 function replaceStr (content) {
@@ -46,13 +46,13 @@ function replaceStr (content) {
   let i = 0, n = content.length
   while (i < n) {
     const char = content[i]
-    if (['\'', '"', '`'].includes(char)) {
-      const closeIndex = content.slice(i + 1).indexOf(char)
-      const strContent = content.substr(i, closeIndex + 2)
+    if (['\'', '"', '`', '/'].includes(char)) {
+      const endIndex = content.slice(i + 1).indexOf(char)
+      const strContent = content.substr(i, endIndex + 2)
       content = content.replace(strContent, `#${strList.length}#`)
       n = content.length
       i = i + 1 + `#${strList.length}#`.length
-      strList.push(strContent)
+      strList.push(strContent.replace(/\n/g, '').replace(/ +/g, ' '))
     } else {
       i++
     }

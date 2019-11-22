@@ -1,7 +1,10 @@
 !function () {
+  /* Constants */
   const OPTIONS = {
     pagesNumber: 3
   }
+
+  /* Variables */
   let searchResultList = []
   let requestCount = 0
 
@@ -60,7 +63,9 @@
   }
 
   function showLoading () {
-    $('body').append(`<div id="xiaodaStatus" style="position: fixed; right: 10px; bottom: 10px;">Loading...</div>`)
+    $('body').append(`
+      <div id="xiaodaStatus" style="position: fixed; right: 10px; bottom: 10px;">Loading...</div>
+    `)
   }
 
   function hideLoading () {
@@ -75,7 +80,7 @@
       const url = `${baseUrl.replace(/&page=\d+/, '')}&page=${i+1}`
       setTimeout(_ => {
         getSearchResult(url)
-      }, i * 2000 + Math.random() * 500)
+      }, i * 1500 + Math.random() * 500)
     }
   }
 
