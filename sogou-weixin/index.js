@@ -1,6 +1,6 @@
 !function () {
   const OPTIONS = {
-    pagesNumber: 5
+    pagesNumber: 3
   }
   let searchResultList = []
   let requestCount = 0
@@ -25,6 +25,7 @@
       requestCount++
       if (requestCount === OPTIONS.pagesNumber) render()
     }
+    $.get(url).done(_doneCallback).always(_alwaysCallback)
     /*
     const _window = window.open(url)
     $(_window.document).ready(_ => {
@@ -33,11 +34,10 @@
         setTimeout(_ => {
           _window.close()
           _alwaysCallback()
-        }, 100)
+        }, 10)
       }, 10)
     })
     */
-    $.get(url).done(_doneCallback).always(_alwaysCallback)
   }
 
   function render () {
@@ -75,7 +75,7 @@
       const url = `${baseUrl.replace(/&page=\d+/, '')}&page=${i+1}`
       setTimeout(_ => {
         getSearchResult(url)
-      }, i * 1500 + Math.random() * 500)
+      }, i * 2000 + Math.random() * 500)
     }
   }
 
