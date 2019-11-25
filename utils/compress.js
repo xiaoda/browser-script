@@ -30,8 +30,8 @@ function compress (content) {
   return content
     /* Remove blank characters */
     .replace(/\s+([\n\(\)\{\}\[\]\=\>\<\:\;\.\,\?\!\+\-\*\/])/g, (match, p) => p) // From front
-    .replace(/([\n\(\{\[\=\>\<\:\;\.\,\?\!])\s+/g, (match, p) => p) // From behind
-    .replace(/([\)\}\]\+\-\*\/])[ \f\r\t\v]+/g, (match, p) => p) // From behind & needs semicolon
+    .replace(/([\n\(\{\[\=\>\<\:\;\.\,\?\!])\s+/g, (match, p) => p) // From behind, remove new line
+    .replace(/([\)\}\]\+\-\*\/])[ \f\r\t\v]+/g, (match, p) => p) // From behind, reserve new line
 
     /* Remove new lines from very beginning & end */
     .replace(/^\n+/, '')
@@ -52,7 +52,7 @@ function replaceStr (content) {
       content = content.replace(strContent, `#${strList.length}#`)
       n = content.length
       i = i + 1 + `#${strList.length}#`.length
-      strList.push(strContent.replace(/\n/g, '').replace(/ +/g, ' '))
+      strList.push(strContent.replace(/\n/g, ' ').replace(/ +/g, ' '))
     } else {
       i++
     }
